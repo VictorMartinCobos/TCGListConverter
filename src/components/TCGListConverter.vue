@@ -228,7 +228,11 @@
   -->
   <main>    
     <section id="parameters">
-      <p>Select input and output formats, your language, include your deck, and click on "Convert" button.</p>
+      <div>
+        <p>Select input and output formats, your language, how to handle duplicates, include your deck, and click on "Convert" button.</p>
+      <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, TCGListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, TCGListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
+      
+      </div>
       <div id="input_options">
         <img width="150" src="../assets/limitless.png" alt="limitless" @click="input_format = 'limitless'" :class="input_format == 'limitless' ? 'selected_img' : 'unselected_img'"/>
       </div>
@@ -261,7 +265,7 @@
   </main>
   <section id="additional_info">
     <p>This webpage uses <a href="https://tcgdex.dev" target="_blank">TCGdex API</a> to fetch relevant information to convert your deck. This website is not affiliated nor related to the TCGdex project.</p>
-    <p><em>Note:</em>Boss's Orders card has multiple versions and TCGdex API does not provide us information about which version is requested. Therefore, this webpage returns always "Giovanni" version of Boss's Orders.</p>
+    <p><em>Note:</em> Boss's Orders card has multiple versions and TCGdex API does not provide us information about which version is requested. Therefore, this webpage returns always "Giovanni" version of Boss's Orders.</p>
   </section>
 </template>
 
