@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type Ref, nextTick } from 'vue';
+  import { ref, type Ref } from 'vue';
   import axios from 'axios';
   import Swal from 'sweetalert2';
 
@@ -13,7 +13,7 @@
   const language: Ref<string> = ref('en');
   const handle_duplicates: Ref<string> = ref('none');
 
-  const dark_mode: Ref<boolean> = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  //const dark_mode: Ref<boolean> = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const loading: Ref<boolean> = ref(false);
 
