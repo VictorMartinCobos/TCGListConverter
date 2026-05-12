@@ -150,8 +150,18 @@
         const abilities_and_attacks = [...card.abilities || [], ...card.attacks];
         output_data.value += `${card.number_cards_requested} ${card.name} [${abilities_and_attacks.map(element => element.name).join(' | ')}]\n`
       } else {
-        if (card.name == "Boss's Orders") { 
-          card.name = "Boss's Orders - Giovanni";
+        const boss_order_names = {
+          "en": "Boss's Orders",
+          "es": "Órdenes de Jefes",
+          "de": "Befehl vom Boss",
+          "it": "Ordini del Capo",
+          "fr": "Ordres du Boss",
+          "pt": "Ordem da Chefia"
+        }
+        for (const [language_boss_order, card_name] of Object.entries(boss_order_names)) {
+          if (card.name == card_name && language_boss_order == language.value) {
+            card.name += " - Giovanni";
+          }
         }
         output_data.value += `${card.number_cards_requested} ${card.name}\n`
       }
@@ -165,6 +175,7 @@
     }
 
   }
+
 
   async function generate_cards(){
     loading.value = true;
@@ -230,8 +241,7 @@
     <section id="parameters">
       <div>
         <p>Select input and output formats, your language, how to handle duplicates, include your deck, and click on "Convert" button.</p>
-      <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, TCGListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, TCGListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
-      
+        <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, TCGListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, TCGListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
       </div>
       <div id="input_options">
         <img width="150" src="../assets/limitless.png" alt="limitless" @click="input_format = 'limitless'" :class="input_format == 'limitless' ? 'selected_img' : 'unselected_img'"/>
@@ -255,17 +265,20 @@
       </select>
     </section>  
     
-    <section id="input_section">
-      <textarea id="input_textarea" :placeholder="placeholder_textarea" rows="30" cols="40" v-model="input_data"></textarea>
-    </section>
-    <img id="convert_img" src="../assets/convert.png" @click="generate_cards()" width="100" :class="{spinning: loading}" alt="Convert"/>
-    <section id="output_section">
-      <textarea readonly="true" rows="30" cols="40" v-model="output_data" placeholder="This text area will include your cards in the desired format"></textarea>
-    </section>
+    <div id="input_output">
+      <section id="input_section">
+        <textarea id="input_textarea" :placeholder="placeholder_textarea" rows="30" cols="40" v-model="input_data"></textarea>
+      </section>
+      <img id="convert_img" src="../assets/convert.png" @click="generate_cards()" width="100" :class="{spinning: loading}" alt="Convert"/>
+      <section id="output_section">
+        <textarea readonly="true" rows="30" cols="40" v-model="output_data" placeholder="This text area will include your cards in the desired format"></textarea>
+      </section>
+    </div>
   </main>
   <section id="additional_info">
     <p>This webpage uses <a href="https://tcgdex.dev" target="_blank">TCGdex API</a> to fetch relevant information to convert your deck. This website is not affiliated nor related to the TCGdex project.</p>
-    <p><em>Note:</em> Boss's Orders card has multiple versions and TCGdex API does not provide us information about which version is requested. Therefore, this webpage returns always "Giovanni" version of Boss's Orders.</p>
+    <p><em>Note 1:</em> Boss's Orders card has multiple versions and TCGdex API does not provide us information about which version is requested. Therefore, this webpage returns always "Giovanni" version of Boss's Orders.</p>
+    <p><em>Note 2:</em> We have found that Switch card is not properly imported with Cardtrader import function. Therefore, you will need to add it manually.</p>
   </section>
 </template>
 
@@ -278,7 +291,7 @@
   }
 
   #app {
-    height: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -326,8 +339,17 @@
     align-items: center;
     justify-content: space-around;
     gap: 5rem;
-    padding: 3rem 10rem;
+    padding: 3rem 7dvw;
     margin: auto;
+  }
+
+  #input_output {
+    display: flex;
+    flex-direction: row;
+    flex: 7;
+    align-items: center;
+    justify-content: space-around;
+    gap: 0.5rem;
   }
 
   #parameters {
@@ -337,6 +359,7 @@
     align-items: center;
     justify-content: center;
     flex: 3;
+    max-width: 90dvw;
   }
 
   #convert_img {
@@ -377,6 +400,7 @@
     align-items: center;
     margin-top: auto;
     margin-bottom: 1rem;
+    max-width: 90dvw;
   }
 
   #additional_info > p {
@@ -412,6 +436,31 @@
 
   .spinning {
     animation: spin 2s linear infinite;
+  }
+
+  @media (max-width: 1280px) {
+    main {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 900px) {
+    #input_output {
+      flex-direction: column;
+      margin: auto;
+    }
+
+    textarea {
+      width: 80dvw;
+    }
+
+    main {
+      margin: 0;
+    }
+
+    #output_options {
+      flex-direction: column;
+    }
   }
 
   
