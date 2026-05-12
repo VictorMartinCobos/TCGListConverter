@@ -13,8 +13,6 @@
   const language: Ref<string> = ref('en');
   const handle_duplicates: Ref<string> = ref('none');
 
-  //const dark_mode: Ref<boolean> = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
-
   const loading: Ref<boolean> = ref(false);
 
   type Card = {
@@ -231,15 +229,10 @@
 </script>
 
 <template>
-  <!--
-  <label id="toggle-theme" @click="dark_mode = !dark_mode">
-      <img v-show="!dark_mode" width="30" src="../assets/light_mode.svg" alt="light mode"/>
-      <img v-show="dark_mode" width="30" src="../assets/dark_mode.svg" alt="dark mode"/>
-  </label>
-  -->
   <main>    
     <section id="parameters">
       <div>
+        <p>This web application is a tool to convert your Pokémon TCG list from one format to another.</p>
         <p>Select input and output formats, your language, how to handle duplicates, include your deck, and click on "Convert" button.</p>
         <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, TCGListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, TCGListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
       </div>
