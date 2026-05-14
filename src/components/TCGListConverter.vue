@@ -12,6 +12,7 @@
   const output_format: Ref<string> = ref('');
   const language: Ref<string> = ref('en');
   const handle_duplicates: Ref<string> = ref('none');
+  const lowest_price_cardtrader: Ref<boolean> = ref(false);
 
   const loading: Ref<boolean> = ref(false);
 
@@ -138,6 +139,55 @@
     return cards_info;
   }
 
+
+  async function get_cheapeast_version_of_cards(cards: TcgDexCard[]): Promise<TcgDexCard[]> {
+    let cheapeast_versions: TcgDexCard[] = [];
+
+    for (const card of cards) {
+      let attacks_string = ""
+      if (["Pokemon", "Pokémon"].includes(card.category)) {
+        card.attacks.forEach((attack, idx) => {
+          attacks_string += `&attacks.${idx}.name=eq:${attack.name}`
+        })
+      } 
+      
+      let best_version: TcgDexCard | null = null;
+
+      await axios.get(
+      `https://api.tcgdex.net/v2/${language.value}/cards?name=eq:${card.name}${attacks_string}`
+      ).then(async function(response) {
+        if (response.data) {
+          const all_versions_available = response.data;
+          for (const version of all_versions_available) {
+            const card_expansion_number = version.localId;
+            const expansion_id = version.id.split('-' + card_expansion_number)[0];
+            await axios.get(
+              `https://api.tcgdex.net/v2/${language.value}/sets/${expansion_id}/${card_expansion_number}`
+            ).then(function(response) {
+              if (response.data) {
+                const tcgdex_card = response.data;
+                if (
+                  best_version == null || (tcgdex_card.pricing?.cardmarket?.avg !== undefined && best_version.pricing?.cardmarket?.avg === undefined) ||
+                  tcgdex_card.pricing?.cardmarket?.avg < best_version.pricing?.cardmarket?.avg) {
+                  best_version = tcgdex_card
+                }
+              } 
+            })
+          }
+          if (best_version != null) {
+            best_version.number_cards_requested = card.number_cards_requested;
+            cheapeast_versions.push(best_version)
+          } else {
+            cards_with_errors.value.push(`${card.number} ${card.card} ${card.expansion} ${card.expansion_number}`)
+          }
+        }
+      })
+    }
+    
+    return cheapeast_versions;
+  }
+
+
   async function convert_cards_to_cardmarket_format(expansions_requested: string[], cards_requested_object: Card[]) {
     const expansions_info: Expansion[] = await get_expansions_info(expansions_requested);
 
@@ -167,10 +217,55 @@
 
   }
 
-  function convert_cards_to_cardtrader_format(cards_requested_object: Card[]) {
-    for (const card of cards_requested_object) {
-      output_data.value += `${card.number} ${card.card} (${card.expansion})\n`
+  async function convert_cards_to_cardtrader_format(expansions_requested: string[], cards_requested_object: Card[], lowest_price: boolean) {
+    if (lowest_price) {
+      const energy_cards: Card[] = cards_requested_object.filter(card => [
+        "Basic Grass Energy", "Basic Fire Energy", "Basic Water Energy", "Basic Lightning Energy", "Basic Colorless Energy",
+        "Basic Psychic Energy", "Basic Fighting Energy", "Basic Darkness Energy", "Basic Metal Energy", "Basic Fairy Energy",
+        "Grass Energy", "Fire Energy", "Water Energy", "Lightning Energy", "Colorless Energy",
+        "Psychic Energy", "Fighting Energy", "Darkness Energy", "Metal Energy", "Fairy Energy",
+      ].includes(card.card));
+      
+      const cards_requested = cards_requested_object.filter(card => !energy_cards.includes(card));
+
+      const expansions_info: Expansion[] = await get_expansions_info(expansions_requested);
+
+      const cards_info: TcgDexCard[] = await get_cards(cards_requested, expansions_info);
+
+      const cheapest_cards: TcgDexCard[] = await get_cheapeast_version_of_cards(cards_info);
+      
+
+      const new_expansions_ids: string[] = [...new Set(cheapest_cards.map(card => card.set.id))];
+
+      const new_expansions: Expansion[] = [];
+      for (const expansion of new_expansions_ids) {
+        await axios.get(
+          `https://api.tcgdex.net/v2/${language.value}/sets/${expansion}`
+        ).then(function(response) {
+          if (response.data) {
+            new_expansions.push({
+              "api_id": response.data.id,
+              "name": response.data.name,
+              "symbol": response.data.abbreviation.official
+            })
+          }
+        })
+      }
+      
+      for (const card of cheapest_cards) {
+        let expansion_items: Expansion[] = new_expansions.filter(expansion => expansion.api_id == card.set.id)
+        if (expansion_items.length != 1) {
+          cards_with_errors.value.push(`${card.number_cards_requested} ${card.name} ${card.expansion} ${card.expansion_number}`)
+        } else {
+          output_data.value += `${card.number_cards_requested} ${card.name} (${expansion_items[0].symbol})\n`
+        }
+      }
+    } else {
+      for (const card of cards_requested_object) {
+        output_data.value += `${card.number} ${card.card} (${card.expansion})\n`
     }
+    }
+    
 
   }
 
@@ -199,7 +294,7 @@
       await convert_cards_to_cardmarket_format(expansions_requested, cards_requested_object);
     }
     else if (output_format.value == 'cardtrader') {
-      convert_cards_to_cardtrader_format(cards_requested_object);
+      await convert_cards_to_cardtrader_format(expansions_requested, cards_requested_object, lowest_price_cardtrader.value);
     }
     else {
       Swal.fire({
@@ -256,6 +351,9 @@
         <option value="max_4">Max 4 of each card</option>
         <option value="max_any_reference">Max as cards as indicated in any line</option>
       </select>
+      <label v-show="output_format=='cardtrader'">
+        <input type="checkbox" id="lowest_price_cardtrader" v-model="lowest_price_cardtrader" /> Search for set with lowest price (basic energies will be removed)
+      </label>
     </section>  
     
     <div id="input_output">
@@ -294,8 +392,17 @@
 </style>
 
 <style scoped>
-  p {
+  p, label {
     color: #e5e7eb;
+  }
+
+  label {
+    background-color: transparent;
+    color: #e5e7eb;
+
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 8px 12px;
   }
 
   #toggle-theme {
