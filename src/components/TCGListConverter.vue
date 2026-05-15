@@ -369,7 +369,7 @@
   <section id="additional_info">
     <p>This webpage uses <a href="https://tcgdex.dev" target="_blank">TCGdex API</a> to fetch relevant information to convert your deck. This website is not affiliated nor related to the TCGdex project.</p>
     <p><em>Note 1:</em> Boss's Orders card has multiple versions and TCGdex API does not provide us information about which version is requested. Therefore, this webpage returns always "Giovanni" version of Boss's Orders.</p>
-    <p><em>Note 2:</em> We have found that Switch card is not properly imported with Cardtrader import function. Therefore, you will need to add it manually.</p>
+    <p><em>Note 2:</em> Cardtrader search function does not work properly. Some of the imported cards will not match the set requested, and most of the cards have not all the groups they belong to included. Therefore, the "Any" set does not work as intended. Due to this problem, I do recommend you to check every card imported with this web application. If you have any information in order to improve this, feel free to contact with me.</p>
   </section>
 </template>
 
