@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import TCGListConverter from './components/TCGListConverter.vue'
+import PokeListConverter from './components/PokeListConverter.vue'
 </script>
 
 <template>
-  <TCGListConverter />
+  <PokeListConverter />
 </template>

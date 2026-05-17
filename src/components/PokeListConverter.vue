@@ -329,7 +329,7 @@
       <div>
         <p>This web application is a tool to convert your Pokémon TCG list from one format to another.</p>
         <p>Select input and output formats, your language, how to handle duplicates, include your deck, and click on "Convert" button.</p>
-        <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, TCGListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, TCGListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
+        <p><em>Note about how to handle duplicates: </em>If <em>"Max 4 of each card"</em> is selected, PokeListConverter will add the maximum of 4 of each card to your deck. If <em>"Max as cards as indicated in any line"</em> is selected, PokeListConverter will add only the maximum of a card indicated in any reference to that card (if a card is indicated to be included 2 and 3 times in two lines, only 3 of this card will be included).</p>
       </div>
       <div id="input_options">
         <img width="150" src="../assets/limitless.png" alt="limitless" @click="input_format = 'limitless'" :class="input_format == 'limitless' ? 'selected_img' : 'unselected_img'"/>
