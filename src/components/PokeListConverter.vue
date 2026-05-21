@@ -187,6 +187,12 @@
     return cheapeast_versions;
   }
 
+  function convert_cards_to_limitless_format(cards_requested_object: Card[]) {
+    for (const card of cards_requested_object) {
+      output_data.value += `${card.number} ${card.card} ${card.expansion} ${card.expansion_number}\n`
+    }
+  }
+
 
   async function convert_cards_to_cardmarket_format(expansions_requested: string[], cards_requested_object: Card[]) {
     const expansions_info: Expansion[] = await get_expansions_info(expansions_requested);
@@ -290,7 +296,11 @@
       return
     }
 
-    if (output_format.value == 'cardmarket') {
+    if (output_format.value == 'limitless') {
+      console.log(cards_requested_object);
+      convert_cards_to_limitless_format(cards_requested_object);
+    }
+    else if (output_format.value == 'cardmarket') {
       await convert_cards_to_cardmarket_format(expansions_requested, cards_requested_object);
     }
     else if (output_format.value == 'cardtrader') {
@@ -335,6 +345,7 @@
         <img width="150" src="../assets/limitless.png" alt="limitless" @click="input_format = 'limitless'" :class="input_format == 'limitless' ? 'selected_img' : 'unselected_img'"/>
       </div>
       <div id="output_options">
+        <img width="150" src="../assets/limitless.png" alt="limitless" @click="output_format = 'limitless'" :class="output_format == 'limitless' ? 'selected_img' : 'unselected_img'"/>
         <img width="150" src="../assets/cardmarket.png" alt="cardmarket" @click="output_format = 'cardmarket'" :class="output_format == 'cardmarket' ? 'selected_img' : 'unselected_img'"/>
         <img width="150" src="../assets/cardtrader.png" alt="cardtrader" @click="output_format = 'cardtrader'" :class="output_format == 'cardtrader' ? 'selected_img' : 'unselected_img'"/>
       </div>
@@ -538,13 +549,14 @@
     animation: spin 2s linear infinite;
   }
 
-  @media (max-width: 1280px) {
-    main {
+  @media (max-width: 1480px) {
+    #output_options {
       flex-direction: column;
     }
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1150px) {
+    
     #input_output {
       flex-direction: column;
       margin: auto;
@@ -558,6 +570,16 @@
       margin: 0;
     }
 
+    main {
+      flex-direction: column;
+    }
+    
+    #output_options {
+      flex-direction: row;
+    }
+  }
+
+  @media (max-width: 600px  ) {
     #output_options {
       flex-direction: column;
     }
